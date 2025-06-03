@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Psicológico - Descubra sua Vocação</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>tailwind.config={theme:{extend:{colors:{primary:'#6366f1',secondary:'#a855f7'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+body {
+font-family: 'Poppins', sans-serif;
+}
+.quiz-container {
+min-height: 650px;
+}
+.form-input:focus {
+outline: none;
+border-color: #6366f1;
+}
+</style>
+</head>
+<body class="bg-gray-50">
+<div class="relative w-[375px] mx-auto bg-white min-h-[762px] shadow-md overflow-hidden">
+<!-- Nav Bar -->
+<nav class="fixed w-full z-10 bg-white shadow-sm px-4 py-3 flex items-center justify-between">
+<div class="text-2xl font-['Pacifico'] text-primary">logo</div>
+<div class="w-8 h-8 flex items-center justify-center">
+<i class="ri-menu-line ri-lg"></i>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="pt-16 pb-16 quiz-container">
+<!-- Welcome Screen -->
+<section id="welcome-screen" class="px-4 py-6 flex flex-col items-center">
+<div class="w-full h-48 mb-6 overflow-hidden rounded-lg">
+<img src="https://readdy.ai/api/search-image?query=psychology%20professional%20looking%20at%20clipboard%2C%20thoughtful%20expression%2C%20psychology%20office%20background%2C%20soft%20colors%2C%20professional%20setting%2C%20clinical%20environment&width=375&height=192&seq=1&orientation=landscape" alt="Quiz de Psicologia" class="w-full h-full object-cover object-top">
+</div>
+<h1 class="text-2xl font-semibold text-gray-800 mb-3 text-center">Descubra sua Vocação na Psicologia</h1>
+<p class="text-gray-600 text-center mb-8">Responda algumas perguntas e descubra qual abordagem clínica combina mais com seu perfil profissional.</p>
+<button id="start-quiz-btn" class="bg-primary text-white py-3 px-8 rounded-button font-medium shadow-md hover:bg-indigo-600 transition duration-300 w-full">Começar Teste</button>
+</section>
+<!-- Registration Form -->
+<section id="registration-form" class="px-4 py-6 hidden">
+<h2 class="text-xl font-semibold text-gray-800 mb-5">Antes de começar</h2>
+<p class="text-gray-600 mb-6">Preencha seus dados para receber seu resultado personalizado.</p>
+<form id="user-form" class="space-y-4">
+<div>
+<label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nome completo *</label>
+<input type="text" id="name" name="name" required class="form-input w-full px-4 py-3 border border-gray-300 rounded-md text-gray-800 bg-white" placeholder="Seu nome completo">
+</div>
+<div>
+<label for="email" class="block text-sm font-medium text-gray-700 mb-1">E-mail *</label>
+<input type="email" id="email" name="email" required class="form-input w-full px-4 py-3 border border-gray-300 rounded-md text-gray-800 bg-white" placeholder="seu@email.com">
+</div>
+<div>
+<label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Telefone *</label>
+<input type="tel" id="phone" name="phone" required class="form-input w-full px-4 py-3 border border-gray-300 rounded-md text-gray-800 bg-white" placeholder="(00) 00000-0000">
+</div>
+<div class="flex items-start mt-4">
+<div class="flex items-center h-5">
+<input id="terms" name="terms" type="checkbox" required class="h-4 w-4 text-primary border-gray-300 rounded">
+</div>
+<div class="ml-3 text-sm">
+<label for="terms" class="font-medium text-gray-700">Concordo em receber informações sobre cursos e novidades</label>
+</div>
+</div>
+<button type="submit" class="bg-primary text-white py-3 px-8 rounded-button font-medium shadow-md hover:bg-indigo-600 transition duration-300 w-full mt-6">Continuar</button>
+</form>
+</section>
+<!-- Quiz Questions -->
+<section id="quiz-questions" class="px-4 py-6 hidden">
+<div class="w-full bg-gray-200 h-2 rounded-full mb-6">
+<div id="progress-bar" class="bg-primary h-2 rounded-full" style="width: 0%"></div>
+</div>
+<div id="question-container">
+<!-- Questions will be dynamically inserted here -->
+</div>
+<div class="flex justify-between mt-8">
+<button id="prev-btn" class="text-gray-600 py-2 px-4 rounded-button border border-gray-300 font-medium hidden">Anterior</button>
+<div class="flex-grow"></div>
+<button id="next-btn" class="bg-primary text-white py-2 px-6 rounded-button font-medium shadow-md hover:bg-indigo-600 transition duration-300">Próxima</button>
+</div>
+<div class="text-center mt-4">
+<span id="question-counter" class="text-sm text-gray-500">1/8</span>
+</div>
+</section>
+<!-- Loading Screen -->
+<section id="loading-screen" class="px-4 py-6 hidden flex flex-col items-center justify-center h-full">
+<div class="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mb-6"></div>
+<p class="text-gray-600 text-center">Analisando suas respostas...</p>
+</section>
+<!-- Results Screen -->
+<section id="results-screen" class="px-4 py-6 hidden">
+<div class="text-center mb-6">
+<div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+<i class="ri-award-line ri-2x text-primary"></i>
+</div>
+<h2 class="text-xl font-semibold text-gray-800 mb-2" id="result-title"></h2>
+</div>
+<div class="bg-gray-50 rounded-lg p-4 mb-6">
+<p id="result-description" class="text-gray-700"></p>
+</div>
+<div class="w-full h-48 mb-6 overflow-hidden rounded-lg">
+<img id="result-image" src="" alt="Resultado" class="w-full h-full object-cover object-top">
+</div>
+<a id="result-cta" href="#" class="bg-primary text-white py-3 px-8 rounded-button font-medium shadow-md hover:bg-indigo-600 transition duration-300 w-full block text-center mb-4">Saiba mais sobre o curso</a>
+<button id="restart-quiz" class="text-gray-600 py-2 px-4 rounded-button border border-gray-300 font-medium w-full">Refazer o teste</button>
+<div class="mt-6 flex justify-center space-x-4">
+<div class="w-10 h-10 flex items-center justify-center bg-blue-500 text-white rounded-full cursor-pointer">
+<i class="ri-facebook-fill"></i>
+</div>
+<div class="w-10 h-10 flex items-center justify-center bg-green-500 text-white rounded-full cursor-pointer">
+<i class="ri-whatsapp-fill"></i>
+</div>
+<div class="w-10 h-10 flex items-center justify-center bg-blue-400 text-white rounded-full cursor-pointer">
+<i class="ri-twitter-fill"></i>
+</div>
+</div>
+</section>
+</main>
+<!-- Tab Bar -->
+<div class="fixed bottom-0 w-full bg-white border-t border-gray-200 px-2 py-1">
+<div class="grid grid-cols-4 gap-1">
+<div class="flex flex-col items-center py-1 cursor-pointer">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-home-line"></i>
+</div>
+<span class="text-xs mt-1">Início</span>
+</div>
+<div class="flex flex-col items-center py-1 cursor-pointer">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-book-open-line"></i>
+</div>
+<span class="text-xs mt-1">Cursos</span>
+</div>
+<div class="flex flex-col items-center py-1 cursor-pointer">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-question-answer-line"></i>
+</div>
+<span class="text-xs mt-1">Quiz</span>
+</div>
+<div class="flex flex-col items-center py-1 cursor-pointer">
+<div class="w-6 h-6 flex items-center justify-center">
+<i class="ri-user-line"></i>
+</div>
+<span class="text-xs mt-1">Perfil</span>
+</div>
+</div>
+</div>
+</div>
+<script id="quiz-data">
+const questions = [
+{
+question: "Como você prefere abordar os problemas dos seus pacientes?",
+options: [
+{ text: "Analisando padrões de pensamento e comportamento", score: { tcc: 3, espiritualidade: 1, neuropsicologia: 1 } },
+{ text: "Considerando aspectos espirituais e existenciais", score: { tcc: 0, espiritualidade: 3, neuropsicologia: 0 } },
+{ text: "Investigando funções cognitivas e processos cerebrais", score: { tcc: 1, espiritualidade: 0, neuropsicologia: 3 } },
+{ text: "Combinando diferentes abordagens terapêuticas", score: { tcc: 1, espiritualidade: 1, neuropsicologia: 1 } }
+]
+},
+{
+question: "Qual aspecto da psicologia mais desperta seu interesse?",
+options: [
+{ text: "Processos cognitivos e sua influência no comportamento", score: { tcc: 3, espiritualidade: 0, neuropsicologia: 2 } },
+{ text: "A relação entre mente, corpo e espírito", score: { tcc: 0, espiritualidade: 3, neuropsicologia: 0 } },
+{ text: "O funcionamento cerebral e suas disfunções", score: { tcc: 0, espiritualidade: 0, neuropsicologia: 3 } },
+{ text: "Técnicas terapêuticas baseadas em evidências", score: { tcc: 2, espiritualidade: 1, neuropsicologia: 1 } }
+]
+},
+{
+question: "Como você vê a relação entre ciência e espiritualidade?",
+options: [
+{ text: "Prefiro focar apenas em evidências científicas", score: { tcc: 2, espiritualidade: 0, neuropsicologia: 3 } },
+{ text: "Acredito que podem se complementar na prática clínica", score: { tcc: 1, espiritualidade: 3, neuropsicologia: 0 } },
+{ text: "Considero importante, mas com prioridade para a ciência", score: { tcc: 2, espiritualidade: 1, neuropsicologia: 1 } },
+{ text: "Depende do contexto e das necessidades do paciente", score: { tcc: 1, espiritualidade: 2, neuropsicologia: 1 } }
+]
+},
+{
+question: "Qual destas áreas você gostaria de aprofundar seus conhecimentos?",
+options: [
+{ text: "Técnicas para modificação de pensamentos disfuncionais", score: { tcc: 3, espiritualidade: 0, neuropsicologia: 0 } },
+{ text: "Integração de aspectos espirituais no tratamento", score: { tcc: 0, espiritualidade: 3, neuropsicologia: 0 } },
+{ text: "Avaliação e reabilitação neuropsicológica", score: { tcc: 0, espiritualidade: 0, neuropsicologia: 3 } },
+{ text: "Abordagens integrativas em psicoterapia", score: { tcc: 1, espiritualidade: 1, neuropsicologia: 1 } }
+]
+},
+{
+question: "Como você prefere estruturar suas sessões terapêuticas?",
+options: [
+{ text: "Com objetivos claros e técnicas estruturadas", score: { tcc: 3, espiritualidade: 0, neuropsicologia: 2 } },
+{ text: "Abordando dimensões existenciais e espirituais", score: { tcc: 0, espiritualidade: 3, neuropsicologia: 0 } },
+{ text: "Focando em avaliações e exercícios cognitivos", score: { tcc: 1, espiritualidade: 0, neuropsicologia: 3 } },
+{ text: "Adaptando conforme as necessidades de cada paciente", score: { tcc: 1, espiritualidade: 1, neuropsicologia: 1 } }
+]
+},
+{
+question: "Qual público você mais se identifica para trabalhar?",
+options: [
+{ text: "Pessoas com transtornos de ansiedade e depressão", score: { tcc: 3, espiritualidade: 1, neuropsicologia: 0 } },
+{ text: "Pessoas em busca de sentido e propósito na vida", score: { tcc: 0, espiritualidade: 3, neuropsicologia: 0 } },
+{ text: "Pessoas com lesões cerebrais ou déficits cognitivos", score: { tcc: 0, espiritualidade: 0, neuropsicologia: 3 } },
+{ text: "Variados perfis de pacientes e demandas", score: { tcc: 1, espiritualidade: 1, neuropsicologia: 1 } }
+]
+},
+{
+question: "O que mais te motiva na prática clínica?",
+options: [
+{ text: "Ver resultados concretos e mensuráveis", score: { tcc: 3, espiritualidade: 0, neuropsicologia: 2 } },
+{ text: "Promover bem-estar integral e transformação pessoal", score: { tcc: 0, espiritualidade: 3, neuropsicologia: 0 } },
+{ text: "Compreender e tratar disfunções cognitivas", score: { tcc: 0, espiritualidade: 0, neuropsicologia: 3 } },
+{ text: "Ajudar pessoas a superarem dificuldades", score: { tcc: 1, espiritualidade: 1, neuropsicologia: 1 } }
+]
+},
+{
+question: "Qual destas características mais combina com você?",
+options: [
+{ text: "Pragmático e orientado a soluções", score: { tcc: 3, espiritualidade: 0, neuropsicologia: 1 } },
+{ text: "Reflexivo e interessado em questões existenciais", score: { tcc: 0, espiritualidade: 3, neuropsicologia: 0 } },
+{ text: "Analítico e interessado em processos cerebrais", score: { tcc: 0, espiritualidade: 0, neuropsicologia: 3 } },
+{ text: "Flexível e aberto a diferentes perspectivas", score: { tcc: 1, espiritualidade: 1, neuropsicologia: 1 } }
+]
+}
+];
+const results = {
+tcc: {
+title: "Terapia Cognitivo Comportamental",
+description: "A abordagem mais indicada para você é a TCC (Terapia Cognitivo Comportamental). Amplamente conhecida, ela é tende a ser bem aceita pelo público e é baseada em evidências científicas. Bora saber mais?",
+image: "https://readdy.ai/api/search-image?query=cognitive%20behavioral%20therapy%20session%2C%20therapist%20with%20clipboard%2C%20professional%20setting%2C%20warm%20lighting%2C%20clinical%20environment%2C%20psychology%20office&width=375&height=192&seq=2&orientation=landscape",
+url: "#tcc-course-link"
+},
+espiritualidade: {
+title: "Espiritualidade Integrada à Prática Clínica",
+description: "Você já conhece a Espiritualidade Integrada à Prática Clínica? Essa é uma vertente científica que pode combinar com a sua abordagem profissional e que agrega em muitos tratamentos clínicos.",
+image: "https://readdy.ai/api/search-image?query=holistic%20therapy%20session%2C%20spiritual%20elements%20in%20clinical%20practice%2C%20peaceful%20environment%2C%20therapist%20and%20client%20in%20conversation%2C%20warm%20lighting%2C%20professional%20setting&width=375&height=192&seq=3&orientation=landscape",
+url: "#espiritualidade-course-link"
+},
+neuropsicologia: {
+title: "Neuropsicologia",
+description: "Que tal você atuar com a Neuropsicologia? Você já conhece essa vertente? Além de estar afinada com as suas respostas, ela tem sido bem recomendada no mercado e é muito procurada por profissionais que almejam um retorno financeiro a curto prazo.",
+image: "https://readdy.ai/api/search-image?query=neuropsychology%20assessment%2C%20brain%20scan%20results%2C%20professional%20with%20patient%2C%20cognitive%20testing%2C%20clinical%20environment%2C%20medical%20office&width=375&height=192&seq=4&orientation=landscape",
+url: "#neuropsicologia-course-link"
+}
+};
+</script>
+<script id="quiz-functionality">
+document.addEventListener('DOMContentLoaded', function() {
+// Elements
+const welcomeScreen = document.getElementById('welcome-screen');
+const registrationForm = document.getElementById('registration-form');
+const quizQuestions = document.getElementById('quiz-questions');
+const loadingScreen = document.getElementById('loading-screen');
+const resultsScreen = document.getElementById('results-screen');
+const startQuizBtn = document.getElementById('start-quiz-btn');
+const userForm = document.getElementById('user-form');
+const questionContainer = document.getElementById('question-container');
+const progressBar = document.getElementById('progress-bar');
+const questionCounter = document.getElementById('question-counter');
+const prevBtn = document.getElementById('prev-btn');
+const nextBtn = document.getElementById('next-btn');
+const resultTitle = document.getElementById('result-title');
+const resultDescription = document.getElementById('result-description');
+const resultImage = document.getElementById('result-image');
+const resultCta = document.getElementById('result-cta');
+const restartQuiz = document.getElementById('restart-quiz');
+// Quiz state
+let currentQuestion = 0;
+let userAnswers = [];
+let userData = {};
+// Start quiz button
+startQuizBtn.addEventListener('click', function() {
+welcomeScreen.classList.add('hidden');
+registrationForm.classList.remove('hidden');
+});
+// Form submission
+userForm.addEventListener('submit', function(e) {
+e.preventDefault();
+// Collect user data
+userData = {
+name: document.getElementById('name').value,
+email: document.getElementById('email').value,
+phone: document.getElementById('phone').value
+};
+// Send data to email
+fetch('', {
+method: 'POST',
+headers: {
+'Content-Type': 'application/x-www-form-urlencoded',
+},
+body: new URLSearchParams({
+to: 'marketing@neisme.com.br',
+subject: 'Novo Cadastro no Quiz de Psicologia',
+name: userData.name,
+email: userData.email,
+phone: userData.phone,
+date: new Date().toLocaleString()
+})
+}).then(response => {
+console.log('Email sent successfully');
+}).catch(error => {
+console.error('Error sending email:', error);
+});
+// Move to questions
+registrationForm.classList.add('hidden');
+quizQuestions.classList.remove('hidden');
+// Load first question
+loadQuestion(0);
+});
+// Load question function
+function loadQuestion(index) {
+const question = questions[index];
+// Update progress
+progressBar.style.width = `${(index / questions.length) * 100}%`;
+questionCounter.textContent = `${index + 1}/${questions.length}`;
+// Show/hide prev button
+if (index > 0) {
+prevBtn.classList.remove('hidden');
+} else {
+prevBtn.classList.add('hidden');
+}
+// Update next button text for last question
+if (index === questions.length - 1) {
+nextBtn.textContent = 'Finalizar';
+} else {
+nextBtn.textContent = 'Próxima';
+}
+// Create question HTML
+let html = `
+<h3 class="text-lg font-medium text-gray-800 mb-6">${question.question}</h3>
+<div class="space-y-3">
+`;
+// Add options
+question.options.forEach((option, optionIndex) => {
+const isSelected = userAnswers[index] === optionIndex;
+html += `
+<div class="option-card ${isSelected ? 'bg-primary/10 border-primary' : 'bg-white border-gray-200'} border rounded-lg p-4 cursor-pointer transition-all" data-index="${optionIndex}">
+${option.text}
+</div>
+`;
+});
+html += `</div>`;
+// Set HTML and add event listeners
+questionContainer.innerHTML = html;
+// Add click handlers to options
+document.querySelectorAll('.option-card').forEach(card => {
+card.addEventListener('click', function() {
+// Remove selection from all cards
+document.querySelectorAll('.option-card').forEach(c => {
+c.classList.remove('bg-primary/10', 'border-primary');
+c.classList.add('bg-white', 'border-gray-200');
+});
+// Add selection to clicked card
+this.classList.remove('bg-white', 'border-gray-200');
+this.classList.add('bg-primary/10', 'border-primary');
+// Save answer
+userAnswers[index] = parseInt(this.dataset.index);
+});
+});
+}
+// Navigation buttons
+prevBtn.addEventListener('click', function() {
+if (currentQuestion > 0) {
+currentQuestion--;
+loadQuestion(currentQuestion);
+}
+});
+nextBtn.addEventListener('click', function() {
+// Check if an option is selected
+if (userAnswers[currentQuestion] === undefined) {
+// Alert user to select an option
+const options = document.querySelectorAll('.option-card');
+options.forEach(option => {
+option.classList.add('border-red-300', 'animate-pulse');
+setTimeout(() => {
+option.classList.remove('border-red-300', 'animate-pulse');
+}, 1000);
+});
+return;
+}
+if (currentQuestion < questions.length - 1) {
+// Go to next question
+currentQuestion++;
+loadQuestion(currentQuestion);
+} else {
+// Show loading screen
+quizQuestions.classList.add('hidden');
+loadingScreen.classList.remove('hidden');
+// Calculate results after delay
+setTimeout(calculateResults, 2000);
+}
+});
+// Calculate results
+function calculateResults() {
+// Initialize scores
+let scores = {
+tcc: 0,
+espiritualidade: 0,
+neuropsicologia: 0
+};
+// Calculate scores based on answers
+userAnswers.forEach((answerIndex, questionIndex) => {
+const selectedOption = questions[questionIndex].options[answerIndex];
+scores.tcc += selectedOption.score.tcc;
+scores.espiritualidade += selectedOption.score.espiritualidade;
+scores.neuropsicologia += selectedOption.score.neuropsicologia;
+});
+// Determine highest score
+let highestScore = 'tcc';
+if (scores.espiritualidade > scores[highestScore]) {
+highestScore = 'espiritualidade';
+}
+if (scores.neuropsicologia > scores[highestScore]) {
+highestScore = 'neuropsicologia';
+}
+// Display result
+loadingScreen.classList.add('hidden');
+resultsScreen.classList.remove('hidden');
+resultTitle.textContent = results[highestScore].title;
+resultDescription.textContent = results[highestScore].description;
+resultImage.src = results[highestScore].image;
+resultCta.href = results[highestScore].url;
+// Save user data and result (would connect to backend in real implementation)
+console.log('User data:', userData);
+console.log('Quiz result:', highestScore);
+console.log('Scores:', scores);
+}
+// Restart quiz
+restartQuiz.addEventListener('click', function() {
+// Reset state
+currentQuestion = 0;
+userAnswers = [];
+// Show welcome screen
+resultsScreen.classList.add('hidden');
+welcomeScreen.classList.remove('hidden');
+});
+});
+</script>
+<script id="form-validation">
+document.addEventListener('DOMContentLoaded', function() {
+const nameInput = document.getElementById('name');
+const emailInput = document.getElementById('email');
+const phoneInput = document.getElementById('phone');
+// Phone mask
+phoneInput.addEventListener('input', function(e) {
+let value = e.target.value.replace(/\D/g, '');
+if (value.length > 11) {
+value = value.substring(0, 11);
+}
+if (value.length > 2 && value.length <= 6) {
+value = `(${value.substring(0, 2)}) ${value.substring(2)}`;
+} else if (value.length > 6) {
+value = `(${value.substring(0, 2)}) ${value.substring(2, 7)}-${value.substring(7)}`;
+}
+e.target.value = value;
+});
+// Email validation
+emailInput.addEventListener('blur', function() {
+const email = emailInput.value;
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+if (!emailRegex.test(email) && email !== '') {
+emailInput.classList.add('border-red-500');
+// Add error message if it doesn't exist
+if (!document.getElementById('email-error')) {
+const errorMsg = document.createElement('p');
+errorMsg.id = 'email-error';
+errorMsg.className = 'text-red-500 text-xs mt-1';
+errorMsg.textContent = 'Por favor, insira um e-mail válido.';
+emailInput.parentNode.appendChild(errorMsg);
+}
+} else {
+emailInput.classList.remove('border-red-500');
+// Remove error message if it exists
+const errorMsg = document.getElementById('email-error');
+if (errorMsg) {
+errorMsg.remove();
+}
+}
+});
+// Form validation before submit
+document.getElementById('user-form').addEventListener('submit', function(e) {
+let isValid = true;
+// Check name
+if (nameInput.value.trim() === '') {
+nameInput.classList.add('border-red-500');
+isValid = false;
+} else {
+nameInput.classList.remove('border-red-500');
+}
+// Check email
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+if (!emailRegex.test(emailInput.value)) {
+emailInput.classList.add('border-red-500');
+isValid = false;
+} else {
+emailInput.classList.remove('border-red-500');
+}
+// Check phone
+if (phoneInput.value.replace(/\D/g, '').length < 10) {
+phoneInput.classList.add('border-red-500');
+isValid = false;
+} else {
+phoneInput.classList.remove('border-red-500');
+}
+// Check terms
+if (!document.getElementById('terms').checked) {
+document.getElementById('terms').parentNode.classList.add('ring-2', 'ring-red-500', 'rounded-sm');
+isValid = false;
+} else {
+document.getElementById('terms').parentNode.classList.remove('ring-2', 'ring-red-500', 'rounded-sm');
+}
+if (!isValid) {
+e.preventDefault();
+// Scroll to first error
+const firstError = document.querySelector('.border-red-500');
+if (firstError) {
+firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+}
+});
+});
+</script>
+</body>
+</html>
